@@ -281,7 +281,7 @@ def mag_to_size(mag: float) -> float:
 def download_hyg() -> str:
     import zipfile
     """Use local ZIP if it exists to bypass 50MB download limits."""
-    zip_path = os.path.join(os.path.dirname(__file__), "hyg_cache.zip")
+    zip_path = os.path.join(os.path.dirname(__file__), "hyg_cache.csv.zip")
     
     if os.path.exists(zip_path):
         print("[Stars] Using ZIPPED cached HYG database.")
