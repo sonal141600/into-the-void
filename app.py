@@ -279,20 +279,29 @@ def mag_to_size(mag: float) -> float:
 # ══════════════════════════════════════════
 
 def download_hyg() -> str:
-    """Download HYG CSV, cache locally, return content."""
+    import zipfile
+    """Use local ZIP if it exists to bypass 50MB download limits."""
+    zip_path = os.path.join(os.path.dirname(__file__), "hyg_cache.zip")
+    
+    if os.path.exists(zip_path):
+        print("[Stars] Using ZIPPED cached HYG database.")
+        with zipfile.ZipFile(zip_path, "r") as z:
+            # Find the CSV inside the zip file
+            for name in z.namelist():
+                if name.endswith('.csv'):
+                    with z.open(name) as f:
+                        return f.read().decode("utf-8")
+
+    # Fallback just in case
     if os.path.exists(HYG_CACHE):
-        print("[Stars] Using cached HYG database.")
+        print("[Stars] Using unzipped cached HYG database.")
         with open(HYG_CACHE, "r", encoding="utf-8") as f:
             return f.read()
 
     print("[Stars] Downloading HYG database (~50MB) ...")
     r = requests.get(HYG_URL, timeout=60)
     r.raise_for_status()
-    content = r.text
-    with open(HYG_CACHE, "w", encoding="utf-8") as f:
-        f.write(content)
-    print("[Stars] Download complete. Cached locally.")
-    return content
+    return r.text
 
 
 def get_stars(n: int = 9000):
